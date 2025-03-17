@@ -87,7 +87,7 @@ for ticker, df in stock_data.items():
 
 # --- Password Protection ---
 # (For demonstration, we use a hardcoded password. In production, consider using environment variables or a package like streamlit-authenticator.)
-PASSWORD = "your_secure_password"
+PASSWORD = "A&B-Rev1.1"
 
 def check_password():
     if "password_entered" not in st.session_state:
@@ -105,7 +105,7 @@ def check_password():
 
 # --- Main App ---
 if check_password():
-    st.title("Stock Data Analyzer")
+    st.title("Project Z by A&B")
 
     # Inputs
     tickers = st.text_input("Enter tickers separated by commas", "AAPL, MSFT, GOOGL").split(",")
