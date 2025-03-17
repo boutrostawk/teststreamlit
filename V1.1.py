@@ -112,22 +112,22 @@ if check_password():
     start_date = st.date_input("Start Date", value=pd.to_datetime("2023-01-01"))
     end_date = st.date_input("End Date", value=pd.to_datetime("2023-03-01"))
     
-   if st.button("Run Analysis"):
-    stock_data = {}
-    for ticker in [t.strip().upper() for t in tickers]:
-        df = fetch_stock_data(ticker, start_date, end_date)
-        stock_data[ticker] = df
+    if st.button("Run Analysis"):
+        stock_data = {}
+        for ticker in [t.strip().upper() for t in tickers]:
+            df = fetch_stock_data(ticker, start_date, end_date)
+            stock_data[ticker] = df
         
-        st.subheader(f"{ticker} Price and SMA")
-        # Create the figure with the plot
-        fig = plot_stock_with_sma(df, ticker)
-        # Display the figure using Streamlit
-        st.pyplot(fig)
+            st.subheader(f"{ticker} Price and SMA")
+            # Create the figure with the plot
+            fig = plot_stock_with_sma(df, ticker)
+            # Display the figure using Streamlit
+            st.pyplot(fig)
         
-        signal = generate_signal(df)
-        st.write(f"Trading Signal for {ticker}: **{signal}**")
+            signal = generate_signal(df)
+            st.write(f"Trading Signal for {ticker}: **{signal}**")
     
-    # Optionally, let user download the Excel file:
-    save_to_excel(stock_data, "stock_data.xlsx")
-    with open("stock_data.xlsx", "rb") as file:
-        st.download_button("Download Excel File", file, file_name="stock_data.xlsx")
+        # Optionally, let user download the Excel file:
+        save_to_excel(stock_data, "stock_data.xlsx")
+        with open("stock_data.xlsx", "rb") as file:
+            st.download_button("Download Excel File", file, file_name="stock_data.xlsx")
