@@ -16,8 +16,28 @@ def save_to_excel(data_dict, output_file):
             df.to_excel(writer, sheet_name=ticker) # Removed index=False
 
 def plot_stock_with_sma(df, ticker, sma_windows=[10, 20]):
-    plt.figure(figsize=(10, 6))
-    plt.plot(df['Date'], df['Close'], label='Close Price')
+    # Create a new figure and axis
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Plot the closing price
+    ax.plot(df['Date'], df['Close'], label='Close Price')
+    
+    # Calculate and plot SMAs for each specified window
+    for window in sma_windows:
+        sma_label = f'SMA_{window}'
+        df[sma_label] = df['Close'].rolling(window=window).mean()
+        ax.plot(df['Date'], df[sma_label], label=sma_label)
+    
+    # Set plot title and labels
+    ax.set_title(f"{ticker} Price and SMA")
+    ax.set_xlabel("Date")
+    ax.set_ylabel("Price")
+    ax.legend()
+    ax.tick_params(axis='x', rotation=45)
+    fig.tight_layout()
+    
+    # Return the figure for display in Streamlit
+    return fig
     
     # Calculate and plot each SMA
     for window in sma_windows:
@@ -92,18 +112,22 @@ if check_password():
     start_date = st.date_input("Start Date", value=pd.to_datetime("2023-01-01"))
     end_date = st.date_input("End Date", value=pd.to_datetime("2023-03-01"))
     
-    if st.button("Run Analysis"):
-        stock_data = {}
-        for ticker in [t.strip().upper() for t in tickers]:
-            df = fetch_stock_data(ticker, start_date, end_date)
-            stock_data[ticker] = df
-            st.subheader(f"{ticker} Price and SMA")
-            st.pyplot(plt.figure(figsize=(10, 6)))
-            plot_stock_with_sma(df, ticker)
-            signal = generate_signal(df)
-            st.write(f"Trading Signal for {ticker}: **{signal}**")
+   if st.button("Run Analysis"):
+    stock_data = {}
+    for ticker in [t.strip().upper() for t in tickers]:
+        df = fetch_stock_data(ticker, start_date, end_date)
+        stock_data[ticker] = df
         
-        # Optionally, let user download the Excel file:
-        save_to_excel(stock_data, "stock_data.xlsx")
-        with open("stock_data.xlsx", "rb") as file:
-            st.download_button("Download Excel File", file, file_name="stock_data.xlsx")
+        st.subheader(f"{ticker} Price and SMA")
+        # Create the figure with the plot
+        fig = plot_stock_with_sma(df, ticker)
+        # Display the figure using Streamlit
+        st.pyplot(fig)
+        
+        signal = generate_signal(df)
+        st.write(f"Trading Signal for {ticker}: **{signal}**")
+    
+    # Optionally, let user download the Excel file:
+    save_to_excel(stock_data, "stock_data.xlsx")
+    with open("stock_data.xlsx", "rb") as file:
+        st.download_button("Download Excel File", file, file_name="stock_data.xlsx")
